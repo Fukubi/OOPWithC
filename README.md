@@ -2,7 +2,7 @@
 
 ## About
 
-This repository tries to use and explain POO concepts in C, that is Procedural Oriented, note that I don't know if this is a recommended way of doing things and all the things that are here were used for study purposes only.
+This repository tries to use and explain OOP concepts in C, that is Procedural Oriented, note that I don't know if this is a recommended way of doing things and all the things that are here were used for study purposes only.
 
 ## Class like Structs
 
@@ -38,7 +38,8 @@ func();
 With that in mind we can create a Struct that will hold the value of the function pointer and use it that way:
 
 ```C
-typedef struct {
+typedef struct 
+{
     void (*func)();
 } structWithFunction;
 
@@ -94,25 +95,91 @@ void functionToPoint()
     printf("Hello World");
 }
 
-typedef struct {
+typedef struct 
+{
     void (*func)();
 } structWithFunction;
 
 // The constructor for the struct
 // Note that it's written the name of the struct just to differenciate the functions names
-structWithFunction_new(structWithFunction *self)
+structWithFunction_new(structWithFunction *this)
 {
-    // or (*self).func = &functionToPoint;
-    self->func = &functionToPoint;
+    // or (*this).func = &functionToPoint;
+    this->func = &functionToPoint;
 }
 
 
 structWithFunction myStructWithMethods;
 // Using the constructor
-structWithFunction_new(myStructWithMethods);
+structWithFunction_new(&myStructWithMethods);
 
 // Executing the function
 structWithFunction.func();
 ```
 
 With that we know that the constructor is just a function that receives a pointer to the struct and inside this function we initialize it, if using functions inside the struct always remember to pass the address to them.
+
+## Getters and Setters
+
+Another common thing to have in OOP are getters and setters and encapsulation. And here we have the first bad news, we can't have private members inside a struct so a fully encapsulated struct is impossible but the getters and setters are totally possible using function pointers (because they are just functions that receives values and return values).
+
+But we find our first problem here, the C language isn't object oriented and, because of that, it doesn't have a "this" keyword, but we can make our own.
+
+Example:
+
+For this example we will be using the previous code and add a int value one getter and setter for it
+
+```C
+// We use the typedef before, that way we can use the defined keyword inside the struct for the "this" keyword
+typedef struct StructWithFunction StructWithFunction;
+
+// The implementation of the set
+void StructWithFunction_setSomeValue(StructWithFunction *this, int someValue) 
+{
+    // or (*this).someValue = someValue;
+    this->someValue = someValue;
+}
+
+// The implementation of the get
+int StructWithFunction_getSomeValue(StructWithFunction *this)
+{
+    // or (*this).someValue;
+    return this->someValue;
+}
+
+struct StructWithFunction
+{
+    int someValue;
+    // Here we will add the "this" keyword as a pointer to the struct
+    /* 
+     * In this function we are asking for the pointer   
+     * of itself, that way we can access all the 
+     * members inside it, and one int value 
+    */
+    void (*setSomeValue)(StructWithFunction *, int);
+    /*
+     * In this function we are asking for the pointer of itself that will be used for the this keyword and it will return some int value
+    */
+    int (*getSomeValue)(StructWithFunction *);
+};
+
+// The constructor for the struct
+// Note that it's written the name of the struct just to differenciate the functions names
+structWithFunction_new(structWithFunction *this)
+{
+    // or (*this).setSomeValue = &StructWithFunction_setSomeValue;
+    this->setSomeValue = &StructWithFunction_setSomeValue;
+    this->getSomeValue = &StructWithFunction_getSomeValue;
+}
+
+
+structWithFunction myStructWithMethods;
+// Using the constructor
+structWithFunction_new(&myStructWithMethods);
+
+// Using set
+myStructWithMethods.setSomeValue(&myStructWithMethods, 10);
+
+// Using get
+myStructWithMethods.getSomeValue(&myStructWithMethods);
+```
