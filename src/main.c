@@ -9,13 +9,13 @@ int main(void)
     Account_newAccount(&account);
 
     Terminal terminal;
-    Terminal_newTerminal(&terminal);
+    Terminal_newTerminal(&terminal, &account);
 
     terminal.printWelcome();
 
     while (1)
     {
-        if (terminal.runMenu == 0)
+        if (terminal.runMenu(&terminal) == 0)
             break;
     }
 

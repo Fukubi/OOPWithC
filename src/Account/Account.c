@@ -4,52 +4,58 @@
 #include <string.h>
 #include <stdlib.h>
 
-void Account_askForOwnerName(Account *this, const char *msg)
-{
-    printf("%s", msg);
-    scanf("%s", this->owner);
-
-    this->setOwner(this, this->owner);
-}
-
 char *Account_getOwner(Account *this)
 {
-    return this->owner;
+    return this->_private_owner;
 }
 
 void Account_setOwner(Account *this, const char *value)
 {
-    this->owner = realloc(this->owner, strlen(value) + 1);
-    strcpy(this->owner, value);
+    this->_private_owner = realloc(this->_private_owner, strlen(value) + 1);
+    strcpy(this->_private_owner, value);
 }
 
-float Account_getBalance(Account *this)
+void Account_executeWithdraw(Account *this, float valueToWithdraw)
 {
-    return this->balance;
+    this->balance = this->balance - valueToWithdraw;
 }
 
-void Account_setBalance(Account *this, float value)
+void Account_executeDeposit(Account *this, float valueToDeposit)
 {
-    this->balance = value;
+    this->balance = this->balance + valueToDeposit;
+}
+
+void Account_printData(Account *this)
+{
+    printf("Nome do dono: %s\n", this->getOwner(this));
+    printf("Saldo: %.2f\n", this->balance);
+}
+
+void Account_askForOwnerName(Account *this, const char *msg)
+{
+    printf("%s", msg);
+    scanf("%s", this->_private_owner);
+
+    this->setOwner(this, this->_private_owner);
 }
 
 void Account_newAccount(Account *this)
 {
-    this->owner = malloc(1);
+    this->_private_owner = malloc(1);
 
     this->getOwner = &Account_getOwner;
     this->setOwner = &Account_setOwner;
 
-    this->getBalance = &Account_getBalance;
-    this->setBalance = &Account_setBalance;
-
     this->askForOwnerName = &Account_askForOwnerName;
+    this->printData = &Account_printData;
+    this->executeDeposit = &Account_executeDeposit;
+    this->executeWithdraw = &Account_executeWithdraw;
 
     this->setOwner(this, "");
-    this->setBalance(this, 0);
+    this->balance = 0;
 }
 
 void Account_destroyAccount(Account *this)
 {
-    free(this->owner);
+    free(this->_private_owner);
 }

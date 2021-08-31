@@ -5,16 +5,17 @@ typedef struct Account Account;
 
 struct Account
 {
-    char *owner;
+    char *_private_owner;
+
     float balance;
 
     void (*askForOwnerName)(Account *, const char *);
+    void (*printData)(Account *);
+    void (*executeDeposit)(Account *, float);
+    void (*executeWithdraw)(Account *, float);
 
     char *(*getOwner)(Account *);
     void (*setOwner)(Account *, const char *);
-
-    float (*getBalance)(Account *);
-    void (*setBalance)(Account *, float);
 };
 
 void Account_newAccount(Account *);

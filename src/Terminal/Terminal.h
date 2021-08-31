@@ -6,10 +6,12 @@
 typedef struct Terminal Terminal;
 
 struct Terminal {
+    Account *accountToUse;
+
     void (*printWelcome)();
-    int (*runMenu)(Account *);
+    int (*runMenu)(Terminal *);
 };
 
-void Terminal_newTerminal(Terminal *);
+void Terminal_newTerminal(Terminal *this, Account *accountToUse);
 
 #endif
