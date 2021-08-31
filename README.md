@@ -297,3 +297,53 @@ string = realloc(string, strlen(string) + 1);
  * the null character or '\0').
 */
 ```
+
+## Decorators
+
+Decorators are structures that can be used to initialize, do action, store some data, or anything in a "decorated way". If you already used Spring Boot in java you know about it because it's often used the decorator ``` @Autowired ``` or if you're developing APIs using JavaScript and TypeORM you can see a lot of ``` @Column ``` and that's decorators.
+
+What I was looking for was something that I could use like this:
+
+``` @InitializeCarClass(&car) Car car; ```
+
+And, as expected, I've failed, but not totally, in fact I've found a way to do something similar but not so simplistic like that using Macros with arguments. Here's what I've found:
+
+```C
+#include <stdio.h>
+
+// First I define a Macro that will be used like a Decorator
+// I'm using _ because the C compiler can't actually accept a @ in a macro but you could use it with any character
+#define _InitializeCarClass_(X) _InitializeCarClass__EXECUTE(&X);
+/* 
+ * After giving a name to the decorator 
+ * (_InitializeCarClass_) I indicate that I want it to 
+ * call the _InitializeCarClass__EXECUTE function,
+ * make sure to create a function with this exact same
+ * name if not, it will fail while compiles
+*/
+
+// The actual decorator action
+void _InitializeCarClass__EXECUTE(Car *this)
+{
+    this->price = 275.00;
+    this->seats = 5;
+}
+
+typedef struct car 
+{
+    float price;
+    int seats;
+} car;
+
+int main(void)
+{
+    // This is the "Class" that will be used
+    Car car;
+    // Here is the decorator usage
+    _InitializeCarClass_(car);
+
+    // After that we can freely use the initialized class
+    car.seats;
+    return 0;
+}
+```
