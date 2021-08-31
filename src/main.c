@@ -1,19 +1,24 @@
 #include <stdio.h>
+
 #include "Account/Account.h"
+#include "Terminal/Terminal.h"
 
 int main(void)
 {
     Account account;
     Account_newAccount(&account);
 
-    // Testing the set and get for Owner
-    printf("Name of Account Owner: %s\n", account.getOwner(&account));
+    Terminal terminal;
+    Terminal_newTerminal(&terminal);
 
-    account.setOwner(&account, "Foo");
-    printf("Name of Account Owner: %s\n", account.getOwner(&account));
+    terminal.printWelcome();
 
-    account.setOwner(&account, "Foo ooF");
-    printf("Name of Account Owner: %s\n", account.getOwner(&account));
+    while (1)
+    {
+        if (terminal.runMenu == 0)
+            break;
+    }
 
+    Account_destroyAccount(&account);
     return 0;
 }

@@ -1,5 +1,6 @@
 SOURCE = src/main.o \
-		src/Account/Account.o src/Account/Account.h
+		src/Account/Account.o src/Account/Account.h \
+		src/Terminal/Terminal.o src/Terminal/Terminal.h
 
 CC = gcc
 

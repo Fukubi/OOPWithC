@@ -8,11 +8,13 @@ struct Account
     char *owner;
     float balance;
 
-    char *(*getOwner)(Account *);
-    void (*setOwner)(Account *, char *);
+    void (*askForOwnerName)(Account *, const char *);
 
-    void (*getBalance)(Account *);
-    void (*setBalance)(Account *, double);
+    char *(*getOwner)(Account *);
+    void (*setOwner)(Account *, const char *);
+
+    float (*getBalance)(Account *);
+    void (*setBalance)(Account *, float);
 };
 
 void Account_newAccount(Account *);

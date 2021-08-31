@@ -121,7 +121,21 @@ With that we know that the constructor is just a function that receives a pointe
 
 ## Getters and Setters
 
-Another common thing to have in OOP are getters and setters and encapsulation. And here we have the first bad news, we can't have private members inside a struct so a fully encapsulated struct is impossible but the getters and setters are totally possible using function pointers (because they are just functions that receives values and return values).
+Another common thing to have in OOP are getters and setters and encapsulation. About encapsulation, I've found a good answer on what could be done for private variables on a Stack Overflow Answer ([Here is the stack overflow question and answer](https://stackoverflow.com/questions/2672015/hiding-members-in-a-c-struct)) but, for short, we can't stop someone from accessing a variable inside a struct but we can give a "alert" (like using the private name) and even make it a hard to access variable (like using a _ in the start).
+
+Here's a example:
+
+```C
+struct bankAccount {
+    // Here we have a public float variable
+    float balance;
+
+    // Here we have a private int variable
+    int _private_accountId;
+};
+```
+
+Getters and setters are totally possible using function pointers (because they are just functions that receives values and return values).
 
 But we find our first problem here, the C language isn't object oriented and, because of that, it doesn't have a "this" keyword, but we can make our own.
 
@@ -182,4 +196,104 @@ myStructWithMethods.setSomeValue(&myStructWithMethods, 10);
 
 // Using get
 myStructWithMethods.getSomeValue(&myStructWithMethods);
+```
+
+Comment on This: Interestigly enough I think that the possibility to change the "this" keyword in a code is great for flexibility, even tough not recommended.
+
+## Inheritance
+
+Inheritence are often used to inherit some methods from a super class that will be used by other members. As expected we can't do something like that in a normal way, what It's possible to do is create a base parameter that receives a base class.
+
+Example:
+
+```C
+// beep() implementation
+void Vehicle_beep()
+{
+    puts("beep beep");
+}
+
+typedef struct Vehicle {
+    // Every vehicle can do a beep sound
+    void *(beep)();
+} Vehicle;
+
+// The Vehicle constructor
+void Vehicle_newVehicle(Vehicle *this)
+{
+    this->beep = &Vehicle_beep;
+}
+
+// Car is a vehicle, so he will inherit all the methods of vehicle
+typedef struct Car {
+    // Here is the "inheritance"
+    Vehicle base;
+} Car;
+
+// The Car constructor
+void Car_newCar(Car *this)
+{
+    // Initializing the inherited vehicle to use the methods inside it
+    Vehicle_newVehicle(&this->base);
+}
+
+Car car;
+Car_newCar(&car);
+
+// That's the way we can call the inherited method
+car.base.beep();
+```
+
+## Strings
+
+I know that Strings are not OOP only but it is something that is heavily used and don't have a good C support, even more because you need to set the size of the string to use it correctly, but what I want to talk here is not about strings in the ```char string[STRING_SIZE]``` way but the way that you don't acually need to set the size of the String.
+
+Here is a full code explanation of the way to do it:
+
+```C
+/* 
+ * char * is the same as char string
+ * Because arrays are just a collection
+ * Of pointers, but using this way we
+ * Don't actually need to set a size for it
+*/
+char *string;
+
+// You have to allocate one byte in memory and you will know why in a while
+string = malloc(1);
+
+/*
+ * Reading a string without stoping
+ * in the \n character and without needing
+ * to say the size again
+*/ 
+scanf("%[^\n]s", string);
+// Just remember to clear the buffer after the scanf
+setbuf(stdin, NULL);
+
+/*
+ * Here is the main problem, if we do it
+ * This way we will be having a memory overflow
+ * Because the memory is not allocated for a string
+ * In a random size, but with the dynamic allocation
+ * We can solve this issue
+*/
+
+// Here is a way to do it
+// PS: The realloc can be found in the stdlib.h
+// And the strlen in the string.h
+string = realloc(string, strlen(string) + 1);
+/*
+ * Quick explanation on what's happening here
+ * To use realloc we need to, firt of all, already
+ * have allocated some memory for it before and that's
+ * why we use the malloc(1) in the second line. After
+ * the string has been readed we can use it own value
+ * to get the size of the string and, because it
+ * already is a pointer, we can use it to find
+ * the memory block that it was stored before
+ * With that it becomes easy to realloc the memory
+ * using the length of the string and adding 1 (for
+ * the null character or '\0').
+*/
 ```
